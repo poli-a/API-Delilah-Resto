@@ -1,0 +1,412 @@
+openapi: 3.0.0
+info:
+  version: 1-oas3
+  title: Delilah Resto APP
+  description: API para gestión de un resto
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/poli-a/Delilah-Resto/1
+  - description: Servidor Local
+    url: http://localhost:3000
+
+paths:
+  /pedidos:
+    post:
+      tags: 
+        - Pedidos
+      summary: Registra un nuevo Pedido para el Usuario de la sesion.
+      description: Todos los atributos de la entidad Pedido se generan automaticamente, devolviendo valores por default.
+      responses:
+        '200':
+          description: Retorna mensaje de Pedido registrado y datos del Pedido.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Pedido Registrado'"
+        '400':
+          description: Falla al registrar Pedido.
+          content:
+            application/json:
+              example: "'message': 'Debe iniciar sesion para realizar esta accion.'"                  
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+
+    delete:
+      tags: 
+        - Pedidos
+      summary: Cancela un Pedido registrado (baja logica).
+      description: Cancela un Pedido registrado por el Usuario de la sesion cambiando su propiedad 'cancelado' a true. Valida que el Pedido
+        este registrado y que corresponda al Usuario de la sesion. 
+      responses:
+        '200':
+          description: Cambia el atributo 'cancelado' a true, realizando una baja logica y cancelando el Pedido registrado por el Usuario.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Pedido anulado'"
+        '400':
+          description: Falla al cancelar Pedido.
+          content:
+            application/json:
+              example: "'message': 'No existe pedido registrado con el id 3.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+        - in: header
+          name: pedido_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id del Pedido que se desea cancelar, debe corresponder con el Usuario de la sesion.
+    
+    get:
+      tags: 
+        - Pedidos
+      summary: Retorna todos los Pedidos registrados (solo Usuarios administradores).
+      description: Retorna un array con todos los Pedidos registrados por los Usuarios.
+      responses:
+        '200':
+          description: Solo los Usuarios administradores pueden realizar esta accion. Retorna un array con los Pedidos registrados de todos
+            los Usuarios. 
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Pedidos registrados: '"
+        '400':
+          description: Falla al obtener Pedidos
+          content:
+            application/json:
+              example: "'message': 'Solo los usuario administradores pueden realizar esta accion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion (debe ser admin), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+
+  /pedidos/agregar-producto:
+    put:
+      tags: 
+        - Pedidos
+      summary: Agrega un nuevo Producto al 'detalle' de un Pedido.
+      description: Agrega un Producto al 'detalle' de un Pedido registrado por el Usuario de la sesion.
+        Calcula automaticamente totales y subtotales y se genera descripcion para el Pedido.
+        Valida que el Pedido que se desea actualizar exista y que corresponda al Usuario de la sesion.
+        Valida que el Pedido no se encuente cancelado o confirmado. Valida que el Producto que se desea
+        agregar al 'detalle' se encuentre registrado y activo.
+      responses:
+        '200':
+          description: Retorna mensaje de detalle actualizado y datos del Pedido actualizados.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Detalle actualizado'"
+        '400':
+          description: Falla al actualizar 'detalle' de Pedido.
+          content:
+            application/json:
+              example: "'message': 'El Pedido que se desea modificar no corresponde al Usuario de la sesion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.               
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pedidoId:
+                  type: integer
+                  example: 1
+                productoId:
+                  type: integer
+                  example: 2
+                cantidad:
+                  type: integer
+                  example: 3
+
+  /pedidos/quitar-producto:
+    put:
+      tags: 
+        - Pedidos
+      summary: Elimina un Producto del 'detalle' de un Pedido.
+      description: Elimina un Producto del 'detalle' de un Pedido registrado por el Usuario de la sesion.
+        Calcula automaticamente totales y subtotales y se genera descripcion para el Pedido.
+        Valida que el Pedido que se deasea actualizar exista y que corresponda al Usuario de la sesion.
+        Valida que el Pedido no se encuente cancelado o confirmado. Valida que el Producto que se desea
+        eliminar se encuentre en el 'detalle' del Pedido indicado.
+      responses:
+        '200':
+          description: Retorna mensaje de confirmacion al eliminar Producto, detalle actualizado y datos del Pedido actualizados.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Producto eliminado y detalle actualizado: '"
+        '400':
+          description: Falla al eliminar Producto de 'detalle' de Pedido.
+          content:
+            application/json:
+              example: "'message': 'El pedido con el id 1 no registra producto con id 2.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.               
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pedidoId:
+                  type: integer
+                  example: 1
+                productoId:
+                  type: integer
+                  example: 2
+                cantidad:
+                  type: integer
+                  example: 3
+
+  /pedidos/historial-pedidos:
+    get:
+      tags: 
+        - Pedidos
+      summary: Retorna todos los Pedidos registrados por el Usuario de la sesion.
+      description: Retorna un array con todos los Pedidos registrados por el Usuario de la sesion.
+      responses:
+        '200':
+          description: Valida que el Usuario de la sesion posea Pedidos registrados y retorna un array con los Pedidos registrados por el mismo. 
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Historial de Pedidos:'"
+        '400':
+          description: Falla al obtener Pedidos registrados
+          content:
+            application/json:
+              example: "'message': 'El Usuario no posee Pedidos registrados.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+
+  /pedidos/confirmar-pedido:
+    put:
+      tags: 
+        - Pedidos
+      summary: Cambia el 'estado' de un Pedido registrado por el Usuario de la sesion a 'CONFIRMADO'.
+      description: Cambia el 'estado' de un Pedido registrado por el Usuario de la sesion a 'CONFIRMADO'.
+        Valida que el Pedido exista y pertenesca al Usuario de la sesion. Solo se pueden confirmar los Pedidos
+        que posean el 'estado' 'NUEVO', y los que tengan al menos un Producto en 'detalle'.
+      responses:
+        '200':
+          description: Retorna mensaje de confirmacion de Pedido y datos del Pedido actualizados.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Pedido confirmado:'"
+        '400':
+          description: Falla al confirmar Pedido.
+          content:
+            application/json:
+              example: "'message': 'El Pedido que se desea modificar ya fue 'CONFIRMADO' o 'CANCELADO'.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+        - in: header
+          name: pedido_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Pedido que se desea confirmar (debe corresponder con el Usuario de la sesion).
+
+  /pedidos/modificar-estado:
+    put:
+      tags: 
+        - Pedidos
+      summary: Cambia el 'estado' de un Pedido registrado (solo Usuarios administradores).
+      description: Cambia el 'estado' de un Pedido confirmado por el Usuario. Estados posibles = CONFIRMADO, PREPARANDO, ENVIANDO y ENTREGADO.
+        Solo los Usuarios administradores pueden realizar esta accion. Valida que el Pedido exista y se encuentre previamente confirmado.
+      responses:
+        '200':
+          description: Retorna mensaje de 'estado' actualizado y datos del Pedido actualizados.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Estado actualizado:'"
+        '400':
+          description: Falla al cambiar 'estado' de Pedido.
+          content:
+            application/json:
+              example: "'message': 'El Pedido no se puede modificar porque aun no fue confirmado por el Usuario que lo genero.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pedidoId:
+                  type: integer
+                  example: 1
+                estado:
+                  type: string
+                  example: PREPARANDO
+
+  /pedidos/modificar-direccion:
+    put:
+      tags: 
+        - Pedidos
+      summary: Cambia la 'direccion' de destino de un Pedido registrado por el Usuario de la sesion.
+      description: Cambia la 'direccion' de un Pedido. Valida que el Pedido se encuentre registrado y que corresponda con el Usuario de la sesion.
+      responses:
+        '200':
+          description: Retorna mensaje de 'direccion' actualizada y datos del Pedido actualizados.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Pedido'
+                example: "'message': 'Direccion actualizada:'"
+        '400':
+          description: Falla al cambiar 'direccion' de Pedido.
+          content:
+            application/json:
+              example: "'message': 'El Pedido que se desea modificar no corresponde al Usuario de la sesion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pedidoId:
+                  type: integer
+                  example: 1
+                direccion:
+                  type: string
+                  example: AV. PAZ 11
+
+components:
+  schemas:
+    Pedido:
+      required:
+        - estado
+        - hora
+        - numero
+        - total
+        - descripcion
+        - detalle
+        - direccion
+        - medioDePago
+        - usuarioId
+        - cancelado
+      type: object
+      properties:
+        estado:
+          type: string
+          example: NUEVO
+        hora:
+          type: string
+          example: 1:43:49 PM
+        numero:
+          type: integer
+          example: 1
+        total:
+          type: number
+          example: 260.3
+        descripcion:
+          type: string
+          example: Hamburgesa XL x2
+        detalle:
+          type: array
+          example: []
+        direccion:
+          type: string
+          example: AV. PAZ 11
+        medioDePago:
+          type: object
+          example: { "id": 1,
+            "descripcion": "EFECTIVO" }
+        usuarioId:
+          type: integer
+          example: 1
+        cancelado:
+          type: boolean
+          example: false
