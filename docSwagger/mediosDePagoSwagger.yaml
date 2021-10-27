@@ -1,0 +1,219 @@
+openapi: 3.0.0
+info:
+  version: 1-oas3
+  title: Delilah Resto APP
+  description: API para gestión de un resto
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/poli-a/Delilah-Resto/1
+  - description: Servidor Local
+    url: http://localhost:3000
+
+paths:
+  /medios-de-pago:
+    get:
+      tags: 
+        - Medios de Pago
+      summary: Retorna todos los Medios de Pago registrados y disponibles.
+      description: Retorna un array con todos los Medios de Pago registrados. 
+      responses:
+        '200':
+          description: Retorna un array con los Medios de Pago registrados y disponibles. 
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/MedioDePago'
+                example: "'message': 'Medios de Pago disponibles: '"
+        '400':
+          description: Falla al obtener Medios de Pago
+          content:
+            application/json:
+              example: "'message': 'Debe iniciar sesion para realizar esta accion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+
+    post:
+      tags: 
+        - Medios de Pago
+      summary: Registra un nuevo Medio de Pago (solo Usuarios administradores).
+      description: Registra un nuevo Medio de Pago asignandole un id. Accion valida solo para Usuarios administradores.
+        Valida campo enviado por body.
+      responses:
+        '200':
+          description: Retorna mensaje de Medio de Pago registrado y datos del mismo.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/MedioDePago'
+                example: "'message': 'Medio de pago registrado: '"
+        '400':
+          description: Falla al registrar Medio de Pago.
+          content:
+            application/json:
+              example: "'message': 'La propiedad 'descripcion' es obligatoria para registrar o modiicar el Medio de Pago.'"                  
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion (debe ser administrador), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                descripcion:
+                  type: string
+                  example: TARJETA X
+
+    put:
+        tags: 
+          - Medios de Pago
+        summary: Modifica un Medio de Pago registrado (solo Usuarios administradores).
+        description: Modifica un Medio de Pago registrado. Accion valida solo para Usuarios administradores.
+          Valida los campos enviados por body y la existencia del Medio de Pago indicado. El 'id' del Medio de Pago
+          que se desea eliminar siempre debe ser mayor a '1' (uno). De esta manera el Medio de Pago con 'id' = 1 se vuelve inmutable.
+        responses:
+          '200':
+            description: Retorna mensaje de confirmacion de Medio de Pago actualizado y datos actualizados del mismo.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/MedioDePago'
+                  example: "'message': 'Medio de Pago actualizado:'"
+          '400':
+            description: Falla al modificar un Medio de Pago
+            content:
+              application/json:
+                example: "'message': 'La propiedad 'medioPagoId' es obligatoria para actualizar el Medio de Pago.'"
+        parameters:
+          - in: header
+            name: user_id
+            schema:
+              type: number
+              example: 1
+            required: true
+            description: id de Usuario de la Sesion (debe ser admin), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  medioPagoId:
+                    type: integer
+                    example: 3
+                  descripcion:
+                    type: string
+                    example: TARJETA NN
+
+    delete:
+      tags: 
+        - Medios de Pago
+      summary: Elimina un Medio de Pago registrado (solo Usuarios administradores).
+      description: Elimina un Medio de Pago registrado, validando previamente su existencia. Accion valida solo para Usuarios administradores.
+        El id de los Medios de Pago a eliminar deben ser mayores a '1' (uno), de esta manera se establece como solo lectura
+        al Medio de Pago id = 1 (EFECTIVO).
+      responses:
+        '200':
+          description: Elimina un Medio de Pago registrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/MedioDePago'
+                example: "'message': 'Medio de Pago eliminado con exito'"
+        '400':
+          description: Falla al eliminar Medio de Pago.
+          content:
+            application/json:
+              example: "'message': 'No existe Medio de Pago registrado con el id 27.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion (debe ser admin), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+        - in: header
+          name: mediopago_id
+          schema:
+            type: number
+            example: 3
+          required: true
+          description: id del Medio de Pago que se desea eliminar.
+
+  /medios-de-pago/cambiar:
+    put:
+        tags: 
+          - Medios de Pago
+        summary: Modifica un Medio de Pago para un Pedido registrado por el Usuario de la sesion.
+        description: Modifica un Medio de Pago para un Pedido registrado por el Usuario de la sesion,
+          validando la existencia del Pedido a modificar y el Medio de Pago indicado.
+          Valida los campos enviados en body de request.
+        responses:
+          '200':
+            description: Retorna mensaje de confirmacion de Medio de Pago modificado y datos actualizados del Pedido.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/MedioDePago'
+                  example: "'message': 'Medio de pago modificado: '"
+          '400':
+            description: Falla al modificar un Medio de Pago en un Pedido
+            content:
+              application/json:
+                example: "'message': 'No existe Medio de Pago registrado con el id 17'"
+        parameters:
+          - in: header
+            name: user_id
+            schema:
+              type: number
+              example: 1
+            required: true
+            description: id de Usuario de la Sesion (debe ser admin), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pedidoId:
+                    type: integer
+                    example: 1
+                  medioPagoId:
+                    type: integer
+                    example: 3
+
+components:
+  schemas:
+    MedioDePago:
+      required:
+        - descripcion
+      type: object
+      properties:
+        descripcion:
+          type: string
+          example: TARJETA BANCA

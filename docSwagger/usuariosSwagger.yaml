@@ -1,0 +1,209 @@
+openapi: 3.0.0
+info:
+  version: 1-oas3
+  title: Delilah Resto APP
+  description: API para gestión de un resto
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/poli-a/Delilah-Resto/1
+  - description: Servidor Local
+    url: http://localhost:3000
+
+paths:
+  /usuarios/registro:
+    post:
+      tags: 
+        - Usuarios
+      summary: Registra un nuevo Usuario.
+      description: Registra un nuevo usuario
+      responses:
+        '201':
+          description: Retorna mensaje de usuario registrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Usuario'
+                example: "'message': 'Usuario registrado'"
+        '400':
+          description: Falla al crear el Usuario.
+          content:
+            application/json:
+              example: "'message': 'El email ya se encuentra registrado.'"                  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+
+  /usuarios/login:
+    post:
+      tags: 
+        - Usuarios
+      summary: Login de Usuario.
+      description: Login de Usuario.
+      responses:
+        '200':
+          description: Retorna mensaje de Usuario logueado y datos del Usuario.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Usuario'
+                example: "'message': 'Usuario logueado'"
+        '400':
+          description: Falla al crear en login de Usuario.
+          content:
+            application/json:
+              example: "'message': 'Credenciales incorrectas. Usuario no registrado o desactivado.'"                  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identif:
+                  type: string
+                  example: root
+                password:
+                  type: string
+                  example: 123456
+  /usuarios:
+    put:
+      tags: 
+        - Usuarios
+      summary: Modificacion de Usuario.
+      description: Modificacion de Usuario.
+      responses:
+        '200':
+          description: Retorna mensaje de Usuario modificado y datos del Usuario actualizados. El Usuario de la sesion solo podra modificar sus datos.
+            Los datos atributos permitidos para modificar son 'password', 'telefono' y 'direccion'. Se pueden modificar por cada uno o en su conjunto.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Usuario'
+                example: "'message': 'Datos actualizados.'"
+        '400':
+          description: Falla al modificar Usuario.
+          content:
+            application/json:
+              example: "'message': 'Debe iniciar sesion para realizar esta accion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.               
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: 12345
+                telefono:
+                  type: number
+                  example: 2983748222
+                direccion:
+                  type: string
+                  example: av paz 22
+    delete:
+      tags: 
+        - Usuarios
+      summary: Baja logica de un Usuario.
+      description: Baja logica de un Usuario (desactivacion).
+      responses:
+        '200':
+          description: Cambia el atributo 'is_active' a false, realizando una baja logica del Usuario.
+            Solo el Usuario de la sesion podra desactivar su Usuario y se deslogueara automaticamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Usuario'
+                example: "'message': 'Usuario desactivado..'"
+        '400':
+          description: Falla al desactivar Usuario.
+          content:
+            application/json:
+              example: "'message': 'Debe iniciar sesion para realizar esta accion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo. 
+
+    get:
+      tags: 
+        - Usuarios
+      summary: Retorna todos los Usuarios registrados (solo Usuarios administradores).
+      description: Retorna un array con todos los Usuarios registrados.
+      responses:
+        '200':
+          description: Solo los Usuarios administradores pueden realizar esta accion.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Usuario'
+                example: "'message': 'Usuarios registrados:'"
+        '400':
+          description: Falla al obtener Usuarios
+          content:
+            application/json:
+              example: "'message': 'Solo los usuario administradores pueden realizar esta accion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion (debe ser admin), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+
+components:
+  schemas:
+    Usuario:
+      required:
+        - username
+        - nombreApellido
+        - email
+        - password
+        - telefono
+        - direccion
+      type: object
+      properties:
+        username:
+          type: string
+          example: jdoe
+        nombreApellido:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john@doe.com
+        password:
+          type: string
+          example: 123456
+        telefono:
+          type: integer
+          example: 296455662722
+        direccion:
+          type: string
+          example: AV.PAZ 66

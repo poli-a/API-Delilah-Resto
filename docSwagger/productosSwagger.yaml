@@ -1,0 +1,190 @@
+openapi: 3.0.0
+info:
+  version: 1-oas3
+  title: Delilah Resto APP
+  description: API para gestión de un resto
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/poli-a/Delilah-Resto/1
+  - description: Servidor Local
+    url: http://localhost:3000
+
+paths:
+  /productos:
+    post:
+      tags: 
+        - Productos
+      summary: Registra un nuevo Producto (solo Usuarios administradores).
+      description: Registra un nuevo Producto asignandole un id. Accion valida solo para Usuarios administradores.
+        Valida los campos enviados por body.
+      responses:
+        '200':
+          description: Retorna mensaje de Producto registrado y datos del Pedido.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Producto'
+                example: "'message': 'Producto Registrado'"
+        '400':
+          description: Falla al registrar Producto.
+          content:
+            application/json:
+              example: "'message': 'La propiedad 'descripcion' es obligatoria.'"                  
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion (debe ser administrador), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                descripcion:
+                  type: string
+                  example: Hamburgesa XL
+                precio:
+                  type: number
+                  example: 280
+                is_active:
+                  type: boolean
+                  example: false
+
+    put:
+      tags: 
+        - Productos
+      summary: Modifica un Producto registrado (solo Usuarios administradores).
+      description: Modifica un Producto registrado validando su existencia y los campos enviados en body de request.
+      responses:
+        '200':
+          description: Retorna mensaje de confirmacion de Producto modificado y datos actualizados del mismo.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Producto'
+                example: "'message': 'Producto Modificado'"
+        '400':
+          description: Falla al modificar un Producto registrado
+          content:
+            application/json:
+              example: "'message': 'La propiedad 'is_active' debe ser de tipo Booleano.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion (debe ser admin), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productoId:
+                  type: integer
+                  example: 2
+                descripcion:
+                  type: string
+                  example: Hamburgesa XL
+                precio:
+                  type: number
+                  example: 280
+                is_active:
+                  type: boolean
+                  example: false
+
+    delete:
+      tags: 
+        - Productos
+      summary: Realiza una baja logica de un Producto registrado (solo Usuarios administradores).
+      description: Realiza una baja logica de un Producto registrado, validando previamente su existencia. Accion valida solo para Usuarios administradores.
+      responses:
+        '200':
+          description: Cambia el atributo 'is_active' a false, realizando una baja logica del Producto registrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Producto'
+                example: "'message': 'Producto desactivado'"
+        '400':
+          description: Falla al cancelar Pedido.
+          content:
+            application/json:
+              example: "'message': 'No existe producto registrado con el id 15.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion (debe ser admin), necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+        - in: header
+          name: producto_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id del Producto que se desea desactivar.
+
+    get:
+      tags: 
+        - Productos
+      summary: Retorna todos los Productos registrados.
+      description: Retorna un array con todos los Productos registrados por los Usuarios, tanto los activos como los inactivos. 
+      responses:
+        '200':
+          description: Retorna un array con los Productos registrados de todos los Usuarios. 
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Producto'
+                example: "'message': 'Productos registrados:'"
+        '400':
+          description: Falla al obtener Pedidos
+          content:
+            application/json:
+              example: "'message': 'Debe iniciar sesion para realizar esta accion.'"
+      parameters:
+        - in: header
+          name: user_id
+          schema:
+            type: number
+            example: 1
+          required: true
+          description: id de Usuario de la Sesion, necesario para acceder a todas las rutas permitidas segun el rol del mismo.
+          
+components:
+  schemas:
+    Producto:
+      required:
+        - descripcion
+        - precio
+        - is_active
+      type: object
+      properties:
+        descripcion:
+          type: string
+          example: Hamburgesa XL
+        precio:
+          type: number
+          example: 250
+        is_active:
+          type: boolean
+          example: true
