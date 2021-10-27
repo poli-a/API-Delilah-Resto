@@ -1,4 +1,5 @@
 const datos = require('../datos');
+const clienteRedis = require('../db/redisCon');
 
 //Busca un producto por su id pasado por parametro y retorna un Producto //
 const buscarProductoId = (idProducto) => {
@@ -32,6 +33,11 @@ const delProducto = (productoId) => {
 }
 
 // Retorna array de todos los Productos registrados //
-const getProductos = () => datos.productos;
+const getProductos = () => {
+    clienteRedis.set("productos", JSON.stringify(datos.productos), 'EX', 10*60*60, (error) => {
+        if (error) return error;
+    });
+    return datos.productos;
+};
 
 module.exports = { buscarProductoId, registroProducto, putProducto, delProducto, getProductos }

@@ -13,4 +13,9 @@ const ok200 = (res, msj, data) => {
     return res.status(200).json({'message': msj, 'data': data});
 }
 
-module.exports = { error400, created201, ok200 }
+// Repuesta que recibe por parametro un mensaje de error y retorna un response con codigo de error 404 //
+const error404 = (res, msj) => {
+    return res.status(404).json({'message': msj});
+}
+
+module.exports = { error400, created201, ok200, error404 }

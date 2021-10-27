@@ -7,15 +7,15 @@ const productoCtrl = require('../controllers/productoController');
 const validacionesProducto = require('../middlewares/productoMiddleware');
 const validacionesUser = require('../middlewares/usuarioMiddleware');
 // Validaciones //
-const validacionesModif = [ validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente, validacionesProducto.valCampoBool, validacionesProducto.validarCampoPrecio]
+const validacionesModif = [validacionesUser.validarSesion, validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente, validacionesProducto.valCampoBool, validacionesProducto.validarCampoPrecio]
 // RUTAS //
-// Registro de nuevo pedido //
-router.post('',  [validacionesUser.validarAdmin, validacionesProducto.valCamposNuevoProducto], productoCtrl.productoAlta);
+// Registro de nuevo Producto //
+router.post('',  [validacionesUser.validarSesion, validacionesUser.validarAdmin, validacionesProducto.valCamposNuevoProducto], productoCtrl.productoAlta);
 //  Edita un Producto registrado //
 router.put('', validacionesModif, productoCtrl.modificarProducto);
 // Baja logica de un Producto registrado //
-router.delete('',  [validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente], productoCtrl.eliminarProducto);
+router.delete('',  [validacionesUser.validarSesion, validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente], productoCtrl.eliminarProducto);
 // Lista todos los Productos registrados //
-router.get('', productoCtrl.listarProductos);
+router.get('', validacionesProducto.buscarProdEnCache, productoCtrl.listarProductos);
 
 module.exports = router;

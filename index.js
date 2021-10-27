@@ -1,4 +1,6 @@
+require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet')
 const principalRoutes = require('./routes/principalRoutes');
 const app = express();
 // Swagger //
@@ -16,11 +18,15 @@ const swaggerOptions = {
   };
   
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
+app.use(helmet());
+
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 app.use(express.json());
-require('dotenv').config();
 
 app.use('', principalRoutes);
 
 app.listen(process.env.PORT, () => console.log(`Escuchando el puerto ${process.env.PORT}!`));
+
+module.exports = app;

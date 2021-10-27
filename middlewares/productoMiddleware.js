@@ -2,6 +2,8 @@
 const respuestas = require('../helpers/respuestas');
 // Service //
 const productoService = require('../services/productoService');
+// Cliente Redis //
+const clienteRedis = require('../db/redisCon');
 
 // Valida que un producto este activo por su id, retorna el Producto si se cumple la condicion //
 const validarProductoExistente = (req, res, next) => {
@@ -46,4 +48,13 @@ const validarCampoPrecio = (req, res, next) => {
     next();
 }
 
-module.exports = { validarProductoExistente, validarProductoActivo, valCamposNuevoProducto, valCampoBool, validarCampoPrecio }
+const buscarProdEnCache = (req, res, next) => {
+    clienteRedis.get('productos', (error, rep) => {
+        console.log(rep);
+        if (error) return respuestas.error400(res, 'Ha ocurrido un error inesperado. Contacte al administrador');
+        if (rep) return respuestas.ok200(res, 'Lista de Productos:', JSON.parse(rep));
+        next();
+    });
+}
+
+module.exports = { validarProductoExistente, validarProductoActivo, valCamposNuevoProducto, valCampoBool, validarCampoPrecio, buscarProdEnCache }
