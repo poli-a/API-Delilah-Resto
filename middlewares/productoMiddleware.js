@@ -54,7 +54,6 @@ const validarCampoPrecio = (req, res, next) => {
 
 const buscarProdEnCache = (req, res, next) => {
     clienteRedis.get('productos', (error, rep) => {
-        console.log(rep);
         if (error) return respuestas.error400(res, 'Ha ocurrido un error inesperado. Contacte al administrador');
         if (rep) return respuestas.ok200(res, 'Lista de Productos:', JSON.parse(rep));
         next();

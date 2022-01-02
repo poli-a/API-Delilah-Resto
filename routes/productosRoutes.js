@@ -14,7 +14,7 @@ router.post('',  [validacionesUser.validarSesion, validacionesUser.decodificarUs
 //  Edita un Producto registrado //
 router.put('', validacionesModif, productoCtrl.modificarProducto);
 // Baja logica de un Producto registrado //
-router.delete('',  [validacionesUser.validarSesion, validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente], productoCtrl.eliminarProducto);
+router.delete('',  [validacionesUser.validarSesion, validacionesUser.decodificarUsuario, validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente], productoCtrl.eliminarProducto);
 // Lista todos los Productos registrados //
 router.get('', validacionesProducto.buscarProdEnCache, productoCtrl.listarProductos);
 

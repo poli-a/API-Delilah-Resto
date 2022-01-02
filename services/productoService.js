@@ -43,18 +43,21 @@ const putProducto = async (datosProducto) => {
     return await Producto.findById(datosProducto.productoId);
 }
 
-const delProducto = (productoId) => {
-    let producto = buscarProductoId(productoId);
+const delProducto = async (productoId) => {
+    /*let producto = buscarProductoId(productoId);
     producto.is_active = false;
-    return producto;
+    return producto;*/
+    await Producto.findOneAndUpdate({ "_id": productoId }, { "is_active": false });
+    return await Producto.findById(productoId);
 }
 
 // Retorna array de todos los Productos registrados //
-const getProductos = () => {
-    clienteRedis.set("productos", JSON.stringify(datos.productos), 'EX', 10*60*60, (error) => {
+const getProductos = async () => {
+    let productos = await Producto.find();
+    clienteRedis.set("productos", JSON.stringify(productos), 'EX', 10*60*60, (error) => {
         if (error) return error;
     });
-    return datos.productos;
+    return productos;
 };
 
 module.exports = { buscarProductoId, registroProducto, putProducto, delProducto, getProductos }

@@ -8,8 +8,8 @@ const productoAlta = async (req, res) => respuestas.ok200(res, 'Producto Registr
 // Modificacion de Producto registrado //
 const modificarProducto = async (req, res) => respuestas.ok200(res, 'Producto Modificado', await productoService.putProducto(req.body));
 // Baja logica de Producto registrado //
-const eliminarProducto = (req, res) => respuestas.ok200(res, 'Producto desactivado', productoService.delProducto(parseInt(req.headers.producto_id)));
+const eliminarProducto = async (req, res) => respuestas.ok200(res, 'Producto desactivado', await productoService.delProducto(req.headers.producto_id));
 // Lista todos los Productos registrados //
-const listarProductos = (req, res) => respuestas.ok200(res, 'Productos registrados:', productoService.getProductos());
+const listarProductos = async (req, res) => respuestas.ok200(res, 'Productos registrados:', await productoService.getProductos());
 
 module.exports = { productoAlta, modificarProducto, eliminarProducto, listarProductos}
