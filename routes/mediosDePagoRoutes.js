@@ -16,7 +16,7 @@ router.get('/', mediosDePagoCtrl.listarMediosDePago);
 // Modifica el Medio de Pago de un Pedido registrado por un Usuario //
 router.put('/cambiar', valPutMP, mediosDePagoCtrl.modifMedioDePago);
 // Registra un nuevo medio de pago (solo admin) //
-router.post('/', [valUser.validarAdmin, valMediosDePago.valDescripcion], mediosDePagoCtrl.altaMedioDePago);
+router.post('/', [valUser.decodificarUsuario, valUser.validarAdmin, valMediosDePago.valDescripcion], mediosDePagoCtrl.altaMedioDePago);
 // Edita un Medio de Pago registrado (solo admin) //
 router.put('/', valActualizar, mediosDePagoCtrl.actualizarMedioPago);
 // Elimina un Medio de Pago registrado (solo admin)//

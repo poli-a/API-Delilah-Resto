@@ -82,10 +82,10 @@ const modificarUsuario = async (info, idUsuario) => {
     if (info.telefono) usuario.telefono = info.telefono;
     if (info.direccion) usuario.direccion = info.direccion;*/
     if (info.username) await Usuario.updateOne({ _id: idUsuario }, { username: info.username });
-    if (info.nombreApellido) await Usuario.updateOne({ _id: idUsuario }, { nombreApellido: info.username });
+    if (info.nombreApellido) await Usuario.updateOne({ _id: idUsuario }, { nombreApellido: info.nombreApellido });
     if (info.email) await Usuario.updateOne({ _id: idUsuario }, { email: info.email });
     if (info.password) await Usuario.updateOne({ _id: idUsuario }, { password: info.password });
-    if (info.telefono) await Usuario.updateOne({ _id: idUsuario }, { nombreApellido: info.telefono });
+    if (info.telefono) await Usuario.updateOne({ _id: idUsuario }, { telefono: info.telefono });
     if (info.direccion) await Usuario.updateOne({ _id: idUsuario }, { direccion: info.direccion });
     return await Usuario.findOne({ _id: idUsuario });
 }

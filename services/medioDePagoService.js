@@ -1,4 +1,5 @@
 const datos = require('../datos');
+const MedioDePago = require('../models/MedioDePagoModels');
 
 // Lista todos los medios registrados //
 const getMediosDePago = () => {
@@ -20,11 +21,15 @@ const buscarMedioPago = (idMedioPago) => {
 }
 
 // Registra un nuevo Medio de Pago //
-const postMedioDePago = (descripcion) => {
-    let idxAnterior = datos.mediosDePago.length;
-    let medioPago = {};
-    medioPago.id = idxAnterior + 1;
-    medioPago.descripcion = descripcion;
+const postMedioDePago = async (descripcion) => {
+    // let idxAnterior = datos.mediosDePago.length;
+    //let medioPago = {};
+    let medioPago = await new MedioDePago({
+        descripcion: descripcion
+    });
+    medioPago.save();
+    // medioPago.id = idxAnterior + 1;
+    // medioPago.descripcion = descripcion;
     return medioPago;
 }
 

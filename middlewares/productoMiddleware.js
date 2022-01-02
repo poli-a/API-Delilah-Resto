@@ -6,17 +6,21 @@ const productoService = require('../services/productoService');
 const clienteRedis = require('../db/redisCon');
 
 // Valida que un producto este activo por su id, retorna el Producto si se cumple la condicion //
-const validarProductoExistente = (req, res, next) => {
+const validarProductoExistente = async (req, res, next) => {
     let productoId;
     if (req.headers.producto_id) productoId = req.headers.producto_id;
     if (req.body.productoId) productoId = req.body.productoId;
-    let prod = productoService.buscarProductoId(parseInt(productoId));
-    prod ? next() : respuestas.error400(res, `No existe producto registrado con el id ${ productoId }.`);
+    try {
+        let prod = await productoService.buscarProductoId(productoId);
+        prod ? next() : respuestas.error400(res, `No existe producto registrado con el id ${ productoId }.`);
+    } catch (err) {
+        respuestas.error400(res, `No existe producto registrado con el id ${ productoId }.`);
+    }
 }
 
 // Valida que el producto este disponible mediante la propiedad 'is_active' //
-const validarProductoActivo = (req, res, next) => {
-    let prod = productoService.buscarProductoId(req.body.productoId);
+const validarProductoActivo = async (req, res, next) => {
+    let prod = await productoService.buscarProductoId(req.body.productoId);
     prod.is_active ? next() : respuestas.error400(res, `El producto con el id ${ req.body.productoId } no se encuentra disponible`);
 }
 

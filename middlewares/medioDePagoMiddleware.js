@@ -23,7 +23,7 @@ const valMedioPago = (req, res, next) => {
 
 // Valida el campo 'detalle' al registrar un nuevo Medio de Pago //
 const valDescripcion = (req, res, next) => {
-    req.body.descripcion ? next() : respuestas.error400(res, `La propiedad 'descripcion' es obligatoria para registrar o modiicar el Medio de Pago.`);
+    req.body.descripcion ? next() : respuestas.error400(res, `La propiedad 'descripcion' es obligatoria para registrar o modificar el Medio de Pago.`);
 }
 
 // Valida el campo 'medioPagoId' ante de actualizar un Medio de Pago registrado //

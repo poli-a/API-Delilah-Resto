@@ -7,10 +7,10 @@ const productoCtrl = require('../controllers/productoController');
 const validacionesProducto = require('../middlewares/productoMiddleware');
 const validacionesUser = require('../middlewares/usuarioMiddleware');
 // Validaciones //
-const validacionesModif = [validacionesUser.validarSesion, validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente, validacionesProducto.valCampoBool, validacionesProducto.validarCampoPrecio]
+const validacionesModif = [validacionesUser.validarSesion, validacionesUser.decodificarUsuario, validacionesUser.validarAdmin, validacionesProducto.validarProductoExistente, validacionesProducto.valCampoBool, validacionesProducto.validarCampoPrecio]
 // RUTAS //
 // Registro de nuevo Producto //
-router.post('',  [validacionesUser.validarSesion, validacionesUser.validarAdmin, validacionesProducto.valCamposNuevoProducto], productoCtrl.productoAlta);
+router.post('',  [validacionesUser.validarSesion, validacionesUser.decodificarUsuario, validacionesUser.validarAdmin, validacionesProducto.valCamposNuevoProducto], productoCtrl.productoAlta);
 //  Edita un Producto registrado //
 router.put('', validacionesModif, productoCtrl.modificarProducto);
 // Baja logica de un Producto registrado //
